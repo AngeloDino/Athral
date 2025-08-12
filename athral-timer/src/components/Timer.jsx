@@ -1,63 +1,83 @@
 import { useEffect, useState } from "react";
+import { Cog, Pause, Play } from "lucide-react";
 
 export const Timer = () => {
-    const OPCIONES = [60, 50, 25, 5];
+    const OPCIONES_BREAK = [5, 10, 15, 20];
 
-    const [tiempo, setTiempo] = useState({ minutos: 1, segundos: 0, count: 0 });
+    // Estado para manejar el tipo de temporizador, los segundos, minutos y si está activo
+    // true si es timer, false si es break
+    const [tipo, setTipo] = useState(true);
+    const [count, setCount] = useState(0);
+    const [segundos, setSegundos] = useState(0);
+    const [minutos, setMinutos] = useState(1);
     const [activo, setActivo] = useState(false);
 
+    // Función para iniciar el temporizador
     useEffect(() => {
         if (!activo) return;
-        
-        const interval = setInterval(() => {
-            setTiempo((prev) => {
-                if (prev.segundos <= 0) {
-                    if (prev.minutos <= 0) {
+
+        const timer = setInterval(() => {
+            if (segundos === 0) {
+                if (minutos === 0) {
+                    if (tipo) {
+                        startBreak();
+                        setTipo(false);
+                        setCount(count + 1);
+                    } else {
+                        setMinutos(1);
+                        setTipo(true);
                         setActivo(false);
-                        clearInterval(interval);
-                        return {...prev, count: prev.count + 1};
                     }
-                    return {...prev, minutos: prev.minutos - 1, segundos: 59 };
+                    clearInterval(timer);
+                    return;
                 }
-                return { ...prev, segundos: prev.segundos - 1 };
-            });
+                setMinutos(minutos - 1);
+                setSegundos(1);
+            } else {
+                setSegundos(segundos - 1);
+            }
         }, 1000);
 
-        return () => clearInterval(interval);
-    }, [activo]);
+        return () => clearInterval(timer);
+    });
+
+    const startBreak = () => {
+        setActivo(false);
+        const breakTime = OPCIONES_BREAK[0];
+        setMinutos(breakTime);
+        setSegundos(0);
+    };
+
+    let finalminutos = minutos < 10 ? `0${minutos}` : minutos;
+    let finalsegundos = segundos < 10 ? `0${segundos}` : segundos;
 
     return (
         <div className="flex flex-col items-center justify-center box-border p-6 bg-gray-800 rounded-xl shadow-2xl w-80 mx-auto">
-            <h1 className="text-5xl font-extrabold text-white mb-6 tracking-tight drop-shadow-lg text-center">
-                {`${tiempo.minutos
-                    .toString()
-                    .padStart(2, "0")
-                    .split("")
-                    .join(" ")} : ${tiempo.segundos
-                    .toString()
-                    .padStart(2, "0")
-                    .split("")
-                    .join(" ")}`}
+            <h1 className="text-2xl font-bold text-white mb-4">
+                {tipo ? "Timer" : "Break"}
             </h1>
-            <section className="flex gap-4">
+            <h1 className="text-5xl font-extrabold text-white mb-6 tracking-tight drop-shadow-lg text-center">
+                {finalminutos} : {finalsegundos}
+            </h1>
+            <section className="flex gap-4 ">
                 <button
                     onClick={() => setActivo(true)}
                     className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200"
                 >
-                    Play
+                    <Play className="inline-block" />
                 </button>
                 <button
                     onClick={() => setActivo(false)}
                     className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200"
                 >
-                    Pause
+                    <Pause className="inline-block" />
                 </button>
                 <button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200">
-                    Skip
+                    <Cog className="inline-block" />
                 </button>
             </section>
 
-            <h1>{"Pomodoros: " + tiempo.count}</h1>
+            <h1 className="mt-6 font-bold">Pomodor Count: {count}</h1>
         </div>
     );
 };
