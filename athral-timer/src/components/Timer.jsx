@@ -9,7 +9,7 @@ export const Timer = () => {
     const [tipo, setTipo] = useState(true);
     const [count, setCount] = useState(0);
     const [segundos, setSegundos] = useState(0);
-    const [minutos, setMinutos] = useState(1);
+    const [minutos, setMinutos] = useState(25);
     const [activo, setActivo] = useState(false);
 
     // Función para iniciar el temporizador
@@ -24,7 +24,7 @@ export const Timer = () => {
                         setTipo(false);
                         setCount(count + 1);
                     } else {
-                        setMinutos(1);
+                        setMinutos(25);
                         setTipo(true);
                         setActivo(false);
                     }
@@ -32,7 +32,7 @@ export const Timer = () => {
                     return;
                 }
                 setMinutos(minutos - 1);
-                setSegundos(1);
+                setSegundos(59);
             } else {
                 setSegundos(segundos - 1);
             }
